@@ -1,0 +1,11 @@
+Unsorted Notes on the threading model
+
+Repeated Tasks are controlled by Trigger objects.
+A Trigger has an ascociated cycle time.
+
+Triggers are distributed to threads by a scheduler which balances load on threads.
+If a Trigger does not finish its jobs within one cycle an error is reported.
+
+Cycle rates are multiples of a minimal cycle rate.
+
+Different Clocks can be used to allow virtual time for simulations.
