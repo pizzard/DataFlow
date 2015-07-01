@@ -11,6 +11,7 @@
 #include <type_traits>
 
 #include "master_traits.h"
+#include "traits.h"
 
 template<class sender_t, class receiver_t, class param_type>
 struct VoidConnection {
@@ -38,7 +39,7 @@ template<class sender_t, class receiver_t, class receiver_result,
 struct Connection {
 	sender_t sender;
 	receiver_t receiver;
-	receiver_result operator()(const param_type& p) {
+	receiver_result operator()(const param_type&& p) {
 		///execute sender with parameter and execute receiver with result from sender
 		return receiver(sender(p));
 	}
@@ -73,12 +74,13 @@ struct ParamType<false, T> {
 template<class sender_t, class receiver_t>
 struct connection_trait {
 	static const bool sender_no_arg = utils::function_traits<sender_t>::arity == 0;
-	static const bool receiver_no_arg = utils::function_traits<receiver_t>::arity == 0;
 
+	//static_assert(is_callable<sender_t>::value, "Left Hand Side of Connection must be callable");
+	//static_assert(is_callable<receiver_t>::value, "Right Hand Side of Connection must be callable");
 
 	typedef typename ParamType<sender_no_arg, sender_t>::type sender_param;
-	typedef typename ParamType<receiver_no_arg, receiver_t>::type receiver_param;
-	typedef typename utils::function_traits<receiver_t>::result_type receiver_result;
+	//typedef typename utils::function_traits<receiver_t>::result_type receiver_result;
+	typedef typename result_of<receiver_t>::type receiver_result;
 
 	static const bool result_is_void = std::is_void<receiver_result>::value;
 	typedef typename std::conditional<result_is_void,

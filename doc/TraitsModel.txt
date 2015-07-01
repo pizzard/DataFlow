@@ -1,0 +1,17 @@
+during construction of Connection(lhs, rhs)
+evaluate in following order, take first.
+
+Get result_type from Component:
+
+* if lhs::result_type exists, use that.
+* if it can be evaluated use std::result_of(lhs(args))
+
+
+Get arg of rhs
+
+* unnecessary, static assert rhs is callable with lhs::result_type
+
+get result_type from rhs:
+* if rhs::result_type exists, use that
+* if it can be evaluated use std::result_of(rhs(lhs::result_type))
+else error

@@ -18,6 +18,8 @@ int main() {
 	ConnectionTests::TestStream();
 	TestConnections();
 	Collections_test::TestMap();
+	Collections_test::TestChain();
+	Collections_test::TestFilter();
 
 	return 0;
 }

@@ -59,8 +59,8 @@ boost::signals2::connection Connect(boost::signals2::signal<result_t()>& sig,
 }
 
 template<class result_t, class sender_t>
-void Connect(const sender_t& sender, InputPort<result_t>& receiver) {
-	receiver.connect(sender);
+	void Connect(const sender_t& sender, InputPort<result_t>& receiver) {
+		receiver.connect(sender);
 }
 
 template<class sender_t, class receiver_t>
@@ -72,8 +72,7 @@ typename connection_trait<sender_t, receiver_t>::type Connect_impl(
 
 // This connection takes ownership of both sender and receiver
 template<class sender_t, class receiver_t>
-auto Connect(const sender_t& sender, const receiver_t& receiver,
-		typename std::enable_if<!has_connect<sender_t, receiver_t>::value, void>* =	0) {
+auto Connect(const sender_t& sender, const receiver_t& receiver){
 	return Connect_impl(sender, receiver);
 }
 

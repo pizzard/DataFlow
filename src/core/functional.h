@@ -17,18 +17,20 @@ struct copy_map {
 	copy_map(Function f) :
 			fun(f), result_container() {
 	}
-	typedef typename utils::function_traits<Function>::result_type result_type;
+	typedef typename utils::function_traits<Function>::result_type base_t;
+	typedef typename std::vector<base_t> result_type;
 
 	template<class ForwardRange>
-	const std::vector<result_type>& operator()(const ForwardRange& in) {
+	auto operator()(const ForwardRange&& in) {
 		result_container.clear();
-		std::transform(begin(in), end(in), back_inserter(result_container), fun);
+		std::transform(begin(in), end(in), back_inserter(result_container),
+				fun);
 		return result_container;
 	}
 
 private:
 	Function fun;
-	std::vector<result_type> result_container; //ToDo reevaluate choice of vector
+	result_type result_container; //ToDo reevaluate choice of vector
 };
 
 template<class Function>
@@ -38,7 +40,7 @@ struct in_place_map {
 	}
 
 	template<class ForwardRange>
-	auto operator()(ForwardRange& in) {
+	auto operator()(ForwardRange&& in) {
 		auto end = std::transform(begin(in), end(in), in.begin(), fun);
 		return std::make_pair(in.begin(), end); //todo the pair is not a real range
 	}
@@ -48,20 +50,21 @@ private:
 };
 
 template<class Function>
-static auto map(const Function& f)
-{
+static auto map(const Function& f) {
 	return copy_map<Function>(f);
 }
 
-template<class OutputType, class T, class Pred>
+template<class OutputType, class Pred>
 class filter {
 	filter(Pred p) :
 			predicate(p) {
 
 	}
 
+	typedef OutputType result_type;
+
 	template<class ForwardRange>
-	const OutputType& operator()(const ForwardRange&& in) {
+	auto operator()(const ForwardRange&& in) {
 		auto it = std::copy_if(begin(in), end(in), result_cont.begin(),
 				predicate);
 		result_cont.resize(std::distance(result_cont.begin(), it));
@@ -80,6 +83,8 @@ class foldl {
 
 	}
 
+	typedef T result_value;
+
 	template<class ForwardRange>
 	auto operator()(const ForwardRange&& in) {
 		return std::accumulate(begin(in), end(in), initial_value, binop);
@@ -96,6 +101,8 @@ class foldr {
 			binop(op), initial_value(init) {
 
 	}
+
+	typedef T result_value;
 
 	template<class ForwardRange>
 	auto operator()(const ForwardRange&& in) {

@@ -13,7 +13,7 @@ public:
 	Collections_test();
 	virtual ~Collections_test();
 	static void TestMap();
-	static void TestReduce();
+	static void TestFilter();
 	static void TestFold();
 	static void TestChain();
 };
