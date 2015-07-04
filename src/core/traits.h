@@ -61,18 +61,13 @@ struct result_of<copy_map<T>>{
 };
 
 template<class T, class V>
-struct result_of<foldl<T, V>>{
-	typedef typename copy_map<T>::result_type type;
-};
-
-template<class T, class V>
-struct result_of<foldr<T, V>>{
-	typedef typename copy_map<T>::result_type type;
+struct result_of<foldl_t<T, V>>{
+	typedef typename foldl_t<T, V>::result_type type;
 };
 
 template<class T, class Pred>
-struct result_of<filter<T, Pred>>{
-	typedef typename copy_map<T>::result_type type;
+struct result_of<copy_filter<T, Pred>>{
+	typedef typename copy_filter<T, Pred>::result_type type;
 };
 
 #endif /* CORE_TRAITS_H_ */

@@ -34,7 +34,7 @@ void Collections_test::TestMap() {
 	auto op2 = map([](int i) -> int { return i+1; });
 
 	auto give = [](void) ->std::vector<int> {return std::vector<int>({0,0,1,1}); };
-	auto test = Connect(give, op2); //ToDo doesn't build, why? complains about overloaded method, I don't see the overloading
+	auto test = Connect(give, op2);
 
 	auto val = test();
 	assert(val.size() == 4);
@@ -49,9 +49,31 @@ void Collections_test::TestMap() {
 }
 
 void Collections_test::TestFilter() {
+	auto filter_1 = filter<int>([](int i) { return i==1; });
+	auto filter_2 = filter<int>([](int i){ return i==2; });
+	VectorPrint test_print;
+	auto give = [](void) ->std::vector<int> {return std::vector<int>({0,1,1,2}); };
+
+	auto test = Connect(give, filter_1); //ToDo doesn't build, why? complains about overloaded method, I don't see the overloading
+	auto val = test();
+
+	assert(val.size() == 2);
+	assert(val[0] == 1);
+	assert(val[1] == 1);
+
+	auto test_2 = give >> filter_2;
+	assert(test_2().size() == 1);
+	assert(test_2()[0] == 2);
 }
 
 void Collections_test::TestFold() {
+	auto give = [](void) ->std::vector<int> {return std::vector<int>({0,1,2,3}); };
+
+	auto folder = fold([](int a, int b){ return a+b;}, 0);
+
+	auto test = Connect(give, folder);
+	assert(test() == 6);
+
 }
 
 void Collections_test::TestChain() {
@@ -59,6 +81,7 @@ void Collections_test::TestChain() {
 	VectorPrint test_print;
 
 	give >> map([](int i) { return i+1; })
+		 >> filter<int>([](int i) { return i==1;})
 		 >> test_print.in;
 
 	test_print.Trigger();

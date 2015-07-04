@@ -20,6 +20,7 @@ int main() {
 	Collections_test::TestMap();
 	Collections_test::TestChain();
 	Collections_test::TestFilter();
+	Collections_test::TestFold();
 
 	return 0;
 }

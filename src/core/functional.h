@@ -50,40 +50,47 @@ private:
 };
 
 template<class Function>
-static auto map(const Function& f) {
+static auto map(const Function&& f) {
 	return copy_map<Function>(f);
 }
 
 template<class OutputType, class Pred>
-class filter {
-	filter(Pred p) :
-			predicate(p) {
+struct copy_filter {
+	copy_filter(Pred p) :
+			predicate(p), result_container() {
 
 	}
 
-	typedef OutputType result_type;
+	//ToDo should be able to get this through a metafunction from lhs of connection
+	typedef std::vector<OutputType> result_type;
 
 	template<class ForwardRange>
 	auto operator()(const ForwardRange&& in) {
-		auto it = std::copy_if(begin(in), end(in), result_cont.begin(),
+		result_container.resize(in.size());
+		auto it = std::copy_if(begin(in), end(in), result_container.begin(),
 				predicate);
-		result_cont.resize(std::distance(result_cont.begin(), it));
-		return result_cont;
+		result_container.resize(std::distance(result_container.begin(), it));
+		return result_container;
 	}
 
+private:
 	Pred predicate;
-	OutputType result_cont;
-
+	result_type result_container;
 };
 
+template<class OutputType, class Pred>
+static auto filter(const Pred&& p) {
+	return copy_filter<OutputType, Pred>(p);
+}
+
 template<class T, class BinaryOperation>
-class foldl {
-	foldl(BinaryOperation op, T init) :
+struct foldl_t {
+	foldl_t(BinaryOperation op, T init) :
 			binop(op), initial_value(init) {
 
 	}
 
-	typedef T result_value;
+	typedef T result_type;
 
 	template<class ForwardRange>
 	auto operator()(const ForwardRange&& in) {
@@ -96,22 +103,9 @@ private:
 };
 
 template<class T, class BinaryOperation>
-class foldr {
-	foldr(BinaryOperation op, T init) :
-			binop(op), initial_value(init) {
+static auto fold(BinaryOperation op, T init) {
+	return foldl_t<T, BinaryOperation>(op, init);
+}
 
-	}
-
-	typedef T result_value;
-
-	template<class ForwardRange>
-	auto operator()(const ForwardRange&& in) {
-		return std::accumulate(rbegin(in), rend(in), initial_value, binop);
-	}
-
-private:
-	BinaryOperation binop;
-	const T initial_value;
-};
 
 #endif /* CORE_FUNCTIONAL_H_ */
